@@ -62,6 +62,12 @@ LOCK=$work/hangs.lock RECIPE_BLOCK_TIMEOUT=1 expect block-times-out 1 "" "hangs.
 waiting" hangs.md any.expected
 leaves_nothing timed-out-block-leaves-nothing "$work/hangs.lock"
 
+# Nothing waits for this block to start, so its report goes to /dev/null.
+LOCK=$work/term-ignored-timeout.lock STARTED=/dev/null RECIPE_BLOCK_TIMEOUT=1 \
+  expect term-ignored-times-out 1 "" "ignores-term.md: block 1 exited 137
+--- output of block 1" ignores-term.md any.expected
+leaves_nothing term-ignored-timeout-leaves-nothing "$work/term-ignored-timeout.lock"
+
 # signal_run <case> <signal> <fixture> <lock>: sends the signal to run.sh once the fixture's block
 # has started, and expects the run to stop within 10 s, which covers -k 5, with exit 130. The block
 # reports through a FIFO, opened read-write here so neither side blocks on open.
@@ -118,7 +124,7 @@ skipped-fences.md:13: fence is skipped, write exactly ```bash at column 0' \
 # A PATH holding only bash. expect reads stderr with $(< ...), so it needs no cat.
 mkdir "$work/bin"
 ln -s "$(command -v bash)" "$work/bin/bash"
-PATH=$work/bin expect needs-timeout 1 "" "run.sh: needs timeout from GNU coreutils" \
+PATH=$work/bin expect needs-timeout 1 "" "run.sh: needs timeout from GNU coreutils or uutils" \
   two-blocks.md two-blocks.expected
 
 expect unreadable-markdown 1 "" "nope.md: cannot read" nope.md any.expected

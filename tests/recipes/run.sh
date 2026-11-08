@@ -24,7 +24,7 @@ for input in "$markdown" "$expectations"; do
   fi
 done
 if ! command -v timeout > /dev/null; then
-  echo "run.sh: needs timeout from GNU coreutils" >&2
+  echo "run.sh: needs timeout from GNU coreutils or uutils" >&2
   exit 1
 fi
 
@@ -57,13 +57,25 @@ fail_block() {
 # timeout's own process group hides the block from a terminal Ctrl-C, so the trap passes it on.
 # The block is waited on in the background because bash defers traps for a foreground child.
 # timeout leads the block's process group, so -$block_pid also reaches a child that missed its kill.
-# stop_run's wait hides bash's "Killed" notice, which -k 5 causes and the block never wrote.
+# Each wait hides bash's "Killed" notice, which -k 5 causes and the block never wrote.
 block_pid=
+
+# sweep_block <status of timeout>: stops what is left of the block's process group. uutils timeout,
+# Ubuntu 26.04's, sends the KILL of -k to the block alone, so a 137 passes it on to the group.
+sweep_block() {
+  local signal=TERM
+  if [ "$1" -eq 137 ]; then
+    signal=KILL
+  fi
+  kill -"$signal" -- -"$block_pid" 2> /dev/null || true
+}
+
 stop_run() {
+  local status=0
   if [ -n "$block_pid" ]; then
     kill -TERM "$block_pid" 2> /dev/null || true
-    wait "$block_pid" 2> /dev/null || true
-    kill -TERM -- -"$block_pid" 2> /dev/null || true
+    wait "$block_pid" 2> /dev/null || status=$?
+    sweep_block "$status"
   fi
   echo "$markdown: stopped by a signal" >&2
   exit 130
@@ -76,8 +88,8 @@ for i in $(seq "$count"); do
   timeout -k 5 "$block_timeout" bash "$work/block-$i.sh" \
     < /dev/null > "$work/stdout" 2> "$work/stderr" &
   block_pid=$!
-  wait "$block_pid" || status=$?
-  kill -TERM -- -"$block_pid" 2> /dev/null || true
+  wait "$block_pid" 2> /dev/null || status=$?
+  sweep_block "$status"
   block_pid=
   cat "$work/stdout" >> "$work/output"
   if [ "$status" -eq 124 ]; then
