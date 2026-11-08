@@ -105,6 +105,19 @@ case "$tool" in
     expect_failure decoy-plugin "$no_skill" "the plugin does not list the peekaboot skill" \
       CLAUDE_CODE_PLUGIN_DIRS="$decoy"
     ;;
+  codex)
+    wrong_skills_path=$(copy_repo wrong-skills-path)
+    edit_json "$wrong_skills_path/.codex-plugin/plugin.json" '.skills = "./nope/"'
+    expect_failure wrong-skills-path "$wrong_skills_path" "the plugin does not list the peekaboot skill"
+
+    renamed=$(copy_repo renamed)
+    edit_json "$renamed/.codex-plugin/plugin.json" '.name = "not-peekaboot"'
+    expect_failure renamed "$renamed" "does not match marketplace plugin name"
+
+    no_agents_marketplace=$(copy_repo no-agents-marketplace)
+    rm "$no_agents_marketplace/.agents/plugins/marketplace.json"
+    expect_failure no-agents-marketplace "$no_agents_marketplace" "does not contain a supported manifest"
+    ;;
   *)
     echo "unknown tool: $tool" >&2
     exit 2
