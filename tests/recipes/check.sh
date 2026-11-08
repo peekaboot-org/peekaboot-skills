@@ -146,4 +146,19 @@ expect_status 200 /inventory/sync
 wait_for_events 2 'data:{"level":1,' 'level-1 rollups' 180
 
 run_all populated
+
+# log-search.populated forbids org.peekaboot loggers on the pages its recipe reads with q=timeout.
+# That proves the q filter only while the same two pages without q hold such a line.
+unfiltered=$(curl -s --max-time 10 -G "$BASE/peekaboot/api/logs" --data-urlencode 'level=WARN')
+cursor=$(jq -r '.next // empty' <<< "$unfiltered")
+loggers=$(jq -r '.logs[].logger' <<< "$unfiltered")
+if [ -n "$cursor" ]; then
+  loggers+=$'\n'$(curl -s --max-time 10 -G "$BASE/peekaboot/api/logs" --data-urlencode 'level=WARN' \
+    --data-urlencode "cursor=$cursor" | jq -r '.logs[].logger')
+fi
+if ! grep -q '^org\.peekaboot\.' <<< "$loggers"; then
+  echo "no org.peekaboot WARN line without q=timeout, so log-search.populated proves nothing" >&2
+  exit 1
+fi
+
 echo "ok: every block holds before and after traffic"

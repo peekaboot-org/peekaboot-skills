@@ -1,0 +1,10 @@
+"level": "WARN"
+"logger": "com\.example\.shop\.InventoryController"
+"message": "Supplier [0-9]+ sync timeout"
+"traceId": "[0-9a-f]{32}"
+# 120 WARN lines fill a second page, which is the last.
+"next": null
+!^That was the last page\.$
+# The second page keeps the q filter, so Peekaboot's startup WARN about security stays out.
+# check.sh proves that WARN is there without q.
+!"logger": "org\.peekaboot\.
