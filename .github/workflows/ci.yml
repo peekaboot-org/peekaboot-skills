@@ -1,0 +1,167 @@
+name: ci
+
+on:
+  # main only ever fast-forwards to a commit dev already built. Other branches build through their
+  # pull request, so one push never starts two runs.
+  push:
+    branches: [dev]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Checksum-verified downloads, so no third-party action runs in this job.
+      - name: install-actionlint
+        env:
+          VERSION: 1.7.12
+          SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          archive="actionlint_${VERSION}_linux_amd64.tar.gz"
+          curl -fsSL -o "$RUNNER_TEMP/$archive" \
+            "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/${archive}"
+          echo "${SHA256}  $RUNNER_TEMP/$archive" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" actionlint
+
+      - name: install-shellcheck
+        env:
+          VERSION: 0.11.0
+          SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+        run: |
+          archive="shellcheck-v${VERSION}.linux.x86_64.tar.xz"
+          curl -fsSL -o "$RUNNER_TEMP/$archive" \
+            "https://github.com/koalaman/shellcheck/releases/download/v${VERSION}/${archive}"
+          echo "${SHA256}  $RUNNER_TEMP/$archive" | sha256sum --check --strict
+          tar -xJf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" "shellcheck-v${VERSION}/shellcheck"
+          mv "$RUNNER_TEMP/shellcheck-v${VERSION}/shellcheck" "$RUNNER_TEMP/shellcheck"
+
+      - name: actionlint
+        run: '"$RUNNER_TEMP/actionlint" -color -shellcheck "$RUNNER_TEMP/shellcheck"'
+
+      # find, so a new script is checked without editing this step.
+      - name: shellcheck
+        run: find .github tests -name '*.sh' -exec "$RUNNER_TEMP/shellcheck" {} +
+
+  skill-format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: setup-python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: .github/ci/requirements.txt
+
+      - name: install-skills-ref
+        run: pip install --requirement .github/ci/requirements.txt
+
+      - name: format-check-tests
+        run: tests/format/run-test.sh
+
+      - name: skill-format
+        run: .github/ci/check-skill-format.sh skills/peekaboot
+
+  manifest-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: version-check-tests
+        run: tests/versions/run-test.sh
+
+      - name: manifest-versions
+        run: .github/ci/check-manifest-versions.sh .
+
+  plugin-install:
+    strategy:
+      # Each tool reports for itself, so one CLI's break never shows the other as cancelled.
+      fail-fast: false
+      matrix:
+        tool: [claude, codex]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: setup-node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: .github/ci/package-lock.json
+
+      # Install scripts stay off. The one run by name is Claude Code's own, which puts its native
+      # binary in place of the bin stub.
+      - name: install-clis
+        run: |
+          npm ci --prefix .github/ci --ignore-scripts --no-fund --no-audit
+          node .github/ci/node_modules/@anthropic-ai/claude-code/install.cjs
+
+      - name: put-clis-on-path
+        run: echo "$GITHUB_WORKSPACE/.github/ci/node_modules/.bin" >> "$GITHUB_PATH"
+
+      - name: install-check-tests
+        env:
+          TOOL: ${{ matrix.tool }}
+        run: tests/plugin/run-test.sh "$TOOL"
+
+      - name: install-check
+        env:
+          TOOL: ${{ matrix.tool }}
+        run: .github/ci/check-"$TOOL"-plugin.sh .
+
+  recipes:
+    runs-on: ubuntu-latest
+    # check.sh fails by itself within about 11 minutes, one block at run.sh's 300 s limit included,
+    # and setup with a cold build adds 3. A shorter limit would cut off check.sh's own diagnostics.
+    timeout-minutes: 20
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: setup-jdk
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: maven
+          cache-dependency-path: test-app/pom.xml
+
+      - name: runner-tests
+        run: tests/recipes/run-test.sh
+
+      # Resolves Peekaboot's dev snapshot until the agent API ships in a release.
+      - name: build-test-app
+        working-directory: test-app
+        run: ./mvnw --batch-mode --settings ../.github/ci/maven-settings.xml package
+
+      - name: recipes
+        run: tests/recipes/check.sh test-app/target/test-app.jar
