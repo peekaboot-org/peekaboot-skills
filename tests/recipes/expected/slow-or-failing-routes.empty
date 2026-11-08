@@ -1,0 +1,3 @@
+# The route list before any traffic.
+^\[\]$
+^No route has a slow trace\.$

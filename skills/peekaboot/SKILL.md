@@ -81,3 +81,4 @@ Each reference sets its own variables and says what an empty answer means. Run e
 one command.
 
 - A request fails or answers 500: [references/debug-a-500.md](references/debug-a-500.md)
+- Something is slow, or you need the routes that fail most: [references/slow-or-failing-routes.md](references/slow-or-failing-routes.md)

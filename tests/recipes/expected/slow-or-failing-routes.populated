@@ -1,0 +1,8 @@
+"route": "/reports/monthly"
+"latestSlowTraceId": "[0-9a-f]{32}"
+"route": "/orders/\{id\}"
+"errorCount": [1-9]
+# The slow trace's own summary.
+"durationMs": 1[0-9]{3}
+"selfMs": 1[0-9]{3}
+"type": "VERY_SLOW"
