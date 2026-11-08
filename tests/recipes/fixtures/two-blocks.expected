@@ -1,0 +1,4 @@
+# Each block runs in a fresh shell, so the second never sees GREETING.
+^first hello$
+^second unset$
+!should-not-run
