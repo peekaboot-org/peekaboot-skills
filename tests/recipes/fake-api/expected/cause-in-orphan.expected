@@ -1,0 +1,2 @@
+# The root span never arrives, so the block gives up after ten asks with the orphan's stack trace.
+^[[:space:]]+at com\.example\.shop\.Orphan\.run\(Orphan\.java:1\)$

@@ -1,0 +1,10 @@
+# The block waited until the spans arrived, so the cause is there.
+"complete": true
+"outcome": "ERROR"
+"message": "Order 42 has no customer"
+at com\.example\.shop\.OrderController\.order
+# The cause and the error digest both name the type.
+"type": "java.lang.IllegalStateException"
+# The error digest after the traffic.
+"route": "/orders/\{id\}"
+"traceAvailable": true

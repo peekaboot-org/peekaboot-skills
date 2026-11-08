@@ -1,0 +1,3 @@
+# A span exception with a message and no type is still a span exception.
+^No stack trace was recorded for the exception\.$
+!5xx

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Holds run.sh to its contract with the fixtures in fixtures/. Prints one line per case.
+# Holds run.sh to its contract with the fixtures in fixtures/, then runs fake-api/run-test.sh.
+# Prints one line per case.
 set -euo pipefail
 if ! command -v flock > /dev/null; then
   echo "run-test.sh: needs flock from util-linux" >&2
@@ -145,5 +146,8 @@ expect bad-forbidden-pattern 1 "" "bad-forbidden.expected: bad pattern !first(
 --- output of two-blocks.md
 first hello
 second unset" two-blocks.md bad-forbidden.expected
+
+# The recipes' own branching, against canned answers.
+"$here/fake-api/run-test.sh" || failures=$((failures + 1))
 
 [ "$failures" -eq 0 ]

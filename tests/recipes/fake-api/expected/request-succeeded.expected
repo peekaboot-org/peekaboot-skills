@@ -1,0 +1,4 @@
+# A traced request that succeeded prints its summary and nothing about a cause.
+"cause": null
+!^The cause is
+!^No stack trace

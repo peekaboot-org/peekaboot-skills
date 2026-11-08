@@ -1,0 +1,4 @@
+^No Server-Timing header, so Peekaboot did not trace this request\.$
+# The error digest before any failure.
+^\[\]$
+!"outcome"

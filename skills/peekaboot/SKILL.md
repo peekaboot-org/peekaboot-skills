@@ -79,3 +79,5 @@ A jq error `Cannot iterate over null` means the call answered a problem body, su
 
 Each reference sets its own variables and says what an empty answer means. Run each block as
 one command.
+
+- A request fails or answers 500: [references/debug-a-500.md](references/debug-a-500.md)
