@@ -1,5 +1,6 @@
 target/
 evals/results/
+.venv/
 .github/ci/node_modules/
 
 # Codex reads its marketplace from .agents/plugins/. Keep it tracked even where a global
