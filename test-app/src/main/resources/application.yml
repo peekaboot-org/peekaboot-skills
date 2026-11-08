@@ -1,0 +1,18 @@
+server:
+  port: 8090
+  servlet:
+    # Every recipe must work with BASE carrying a context path.
+    context-path: /shop
+
+spring:
+  application:
+    name: test-app
+
+# java -jar counts as a deployment, where Peekaboot is off and its guard on. Storage is off there
+# too; the line keeps a run from writing into the home directory if that default changes.
+peekaboot:
+  enabled: true
+  security:
+    enabled: false
+  storage:
+    enabled: false

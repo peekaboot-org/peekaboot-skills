@@ -1,0 +1,3 @@
+# The index names every endpoint with its purpose, its paths under the context path.
+^/shop/peekaboot/api/traces/\{traceId\}  R
+^/shop/peekaboot/api/logs  Searches captured log lines
