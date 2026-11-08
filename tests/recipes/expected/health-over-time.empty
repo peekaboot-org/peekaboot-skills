@@ -1,0 +1,6 @@
+"intervalMs": 60000
+# A first sample can close during startup, so only the absence of traffic is certain.
+"problems": 
+!"rule": "SERVER_ERRORS"
+"running": true
+"uncleanExit": false

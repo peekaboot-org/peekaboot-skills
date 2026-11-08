@@ -82,3 +82,4 @@ one command.
 
 - A request fails or answers 500: [references/debug-a-500.md](references/debug-a-500.md)
 - Something is slow, or you need the routes that fail most: [references/slow-or-failing-routes.md](references/slow-or-failing-routes.md)
+- CPU, memory, pool or error rate over time, restarts and deployments: [references/health-over-time.md](references/health-over-time.md)

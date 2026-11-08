@@ -1,0 +1,4 @@
+"intervalMs": 60000
+"count": [1-9]
+"rule": "SERVER_ERRORS"
+"running": true
