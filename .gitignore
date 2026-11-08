@@ -1,0 +1,9 @@
+target/
+evals/results/
+.github/ci/node_modules/
+
+# Codex reads its marketplace from .agents/plugins/. Keep it tracked even where a global
+# ignore drops .agents/ as local tooling; .agents/notes/ stays out.
+!/.agents/
+/.agents/*
+!/.agents/plugins/
