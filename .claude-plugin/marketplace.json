@@ -1,0 +1,15 @@
+{
+  "name": "peekaboot",
+  "description": "Peekaboot's skill for coding agents.",
+  "owner": {
+    "name": "Peekaboot",
+    "url": "https://www.peekaboot.org"
+  },
+  "plugins": [
+    {
+      "name": "peekaboot",
+      "source": "./",
+      "description": "Lets a coding agent debug a Spring Boot application through Peekaboot's HTTP API."
+    }
+  ]
+}

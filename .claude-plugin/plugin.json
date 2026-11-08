@@ -1,0 +1,13 @@
+{
+  "name": "peekaboot",
+  "version": "0.1.0",
+  "description": "Lets a coding agent debug a Spring Boot application through Peekaboot's HTTP API.",
+  "author": {
+    "name": "Peekaboot",
+    "url": "https://www.peekaboot.org"
+  },
+  "homepage": "https://www.peekaboot.org/docs/agents/",
+  "repository": "https://github.com/peekaboot-org/peekaboot-skills",
+  "license": "Apache-2.0",
+  "keywords": ["spring-boot", "observability", "tracing", "debugging"]
+}

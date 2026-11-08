@@ -1,0 +1,9 @@
+{
+  "name": "peekaboot-skills-ci",
+  "private": true,
+  "description": "The agent CLIs CI installs the plugin with.",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "2.1.316",
+    "@openai/codex": "0.166.0"
+  }
+}
