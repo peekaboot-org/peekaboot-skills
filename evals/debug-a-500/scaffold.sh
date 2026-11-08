@@ -1,0 +1,1 @@
+../scaffolds/peekaboot-app.sh

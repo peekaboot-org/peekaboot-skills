@@ -1,0 +1,1 @@
+../scaffolds/plain-spring-boot-app.sh

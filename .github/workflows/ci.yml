@@ -53,7 +53,7 @@ jobs:
 
       # find, so a new script is checked without editing this step.
       - name: shellcheck
-        run: find .github tests -name '*.sh' -exec "$RUNNER_TEMP/shellcheck" {} +
+        run: find .github tests evals -name '*.sh' -exec "$RUNNER_TEMP/shellcheck" {} +
 
   skill-format:
     runs-on: ubuntu-latest
