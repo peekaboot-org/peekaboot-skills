@@ -158,10 +158,9 @@ jobs:
       - name: runner-tests
         run: tests/recipes/run-test.sh
 
-      # Resolves Peekaboot's dev snapshot until the agent API ships in a release.
       - name: build-test-app
         working-directory: test-app
-        run: ./mvnw --batch-mode --settings ../.github/ci/maven-settings.xml package
+        run: ./mvnw --batch-mode package
 
       - name: recipes
         run: tests/recipes/check.sh test-app/target/test-app.jar

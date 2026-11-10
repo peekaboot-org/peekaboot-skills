@@ -7,8 +7,7 @@ routes, metrics and logs with `curl` and `jq`.
 
 ## Requirements
 
-- An application on a Peekaboot version that serves `GET /peekaboot/api`. No release serves it
-  yet. The first one is expected to be 1.2.0.
+- An application on Peekaboot 1.2.0 or later, the first version that serves `GET /peekaboot/api`.
 - `curl` and `jq` where the agent runs its commands.
 - An agent that can reach the application. claude.ai and the Claude API run in sandboxes that
   cannot reach `localhost`, so this skill does not support them.
@@ -63,13 +62,9 @@ The recipes live in [skills/peekaboot/references/](skills/peekaboot/references/)
 
 ## Development
 
-Work lands on `dev`. `main` fast-forwards to `dev` once every CI job is green, except as below.
+Work lands on `dev`. `main` fast-forwards to `dev` once every CI job is green.
 CI validates the skill and both marketplaces, installs the plugin into Claude Code and Codex,
 and runs every `bash` block of the skill against `test-app/` before and after traffic.
-
-The test app builds against Peekaboot's dev snapshot. Until Peekaboot's `dev` branch carries the
-agent API, the `recipes` job stays red, locally too, and `main` fast-forwards once every other
-job is green.
 
 Both CLIs keep an installed plugin under its version, so a user who installed it keeps the old
 copy until the version changes. Bump `version` in `.claude-plugin/plugin.json` and
@@ -94,7 +89,7 @@ tests/plugin/run-test.sh claude
 tests/plugin/run-test.sh codex
 .github/ci/check-codex-plugin.sh .
 tests/recipes/run-test.sh
-(cd test-app && ./mvnw --batch-mode --settings ../.github/ci/maven-settings.xml package)
+(cd test-app && ./mvnw --batch-mode package)
 tests/recipes/check.sh test-app/target/test-app.jar
 ```
 

@@ -17,9 +17,7 @@
 
     <properties>
         <java.version>25</java.version>
-        <!-- Dev's snapshot until the agent API ships in 1.2.0; CI adds the snapshot repository
-             through .github/ci/maven-settings.xml. -->
-        <peekaboot.version>1.1.1-SNAPSHOT</peekaboot.version>
+        <peekaboot.version>1.2.0</peekaboot.version>
     </properties>
 
     <dependencies>
