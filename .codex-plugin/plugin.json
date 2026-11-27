@@ -1,6 +1,6 @@
 {
   "name": "peekaboot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lets a coding agent debug a Spring Boot application through Peekaboot's HTTP API.",
   "author": {
     "name": "Peekaboot",
